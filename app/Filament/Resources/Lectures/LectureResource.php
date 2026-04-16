@@ -132,7 +132,7 @@ class LectureResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('start_time')
-                    ->time()
+                    ->time('h:i A')
                     ->sortable(),
 
                 TextColumn::make('batch_name'),

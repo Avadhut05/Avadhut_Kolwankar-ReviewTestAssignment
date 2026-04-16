@@ -20,6 +20,7 @@ class InstructorFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'user_id' => null,
         ];
     }
 }

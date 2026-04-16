@@ -25,60 +25,38 @@ class LecturesRelationManager extends RelationManager
             ->components([
                 DatePicker::make('date')
                     ->required()
-                    ->live(),
+                    ->live()
+                    ->rule(function ($attribute, $value, $fail, $get, $livewire) {
+                        if (! $value) {
+                            return;
+                        }
+
+                        $instructorId = $this->ownerRecord->id;
+                        $lectureId = $livewire->mountedTableActionRecord ?? null;
+
+                        $exists = Lecture::query()
+                            ->where('instructor_id', $instructorId)
+                            ->whereDate('date', $value)
+                            ->when($lectureId, function ($query) use ($lectureId) {
+                                $query->where('id', '!=', $lectureId);
+                            })
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('This instructor already has a lecture assigned on the selected date.');
+                        }
+                    }),
 
                 TimePicker::make('start_time')
                     ->seconds(false)
                     ->required(),
 
-                 Select::make('instructor_id')
-                ->label('Instructor')
-                ->relationship(
-                    name: 'instructor',
-                    titleAttribute: 'name',
-                    modifyQueryUsing: function ($query, callable $get, $livewire) {
-                        $date = $get('date');
-
-                        $currentInstructorId = $livewire->record?->instructor_id;
-    
-                        if ($date) {
-                            $query->where(function ($q) use ($date, $currentInstructorId, $query) {
-                                $q->whereDoesntHave('lectures', function ($sub) use ($date) {
-                                    $sub->whereDate('date', $date);
-                                });
-
-                                if ($currentInstructorId) {
-                                    $q->orWhere('id', $currentInstructorId);
-                                }
-                            });
-                        }
-                    }
-                )
-                ->preload()
-                ->searchable()
-                ->required()
-                ->rule(function ($attribute, $value, $fail, $get, $livewire) {
-
-                    $date = $get('date');
-
-                    if (! $date || ! $value) {
-                        return;
-                    }
-
-                    $lectureId = $livewire->record?->id;
-
-                    $exists = Lecture::query()
-                        ->where('instructor_id', $value)
-                        ->whereDate('date', $date)
-                        ->when($lectureId, function ($query) use ($lectureId) {
-                            $query->where('id', '!=', $lectureId);
-                        })
-                        ->exists();
-
-                    if ($exists) {
-                        $fail('This instructor is already assigned for the selected date.');
-                    }
-                }),
+                Select::make('course_id')
+                    ->label('Course')
+                    ->relationship('course', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
 
                 TextInput::make('batch_name'),
             ]);
@@ -101,7 +79,7 @@ class LecturesRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('start_time')
-                    ->time()
+                    ->time('h:i A')
                     ->sortable(),
 
                 TextColumn::make('batch_name'),
