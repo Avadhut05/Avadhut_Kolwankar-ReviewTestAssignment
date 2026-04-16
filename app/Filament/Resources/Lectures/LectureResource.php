@@ -6,10 +6,6 @@ use App\Filament\Resources\Lectures\Pages\CreateLecture;
 use App\Filament\Resources\Lectures\Pages\EditLecture;
 use App\Filament\Resources\Lectures\Pages\ListLectures;
 use App\Filament\Resources\Lectures\Pages\ViewLecture;
-use App\Filament\Resources\Lectures\Schemas\LectureForm;
-use App\Filament\Resources\Lectures\Schemas\LectureInfolist;
-use App\Filament\Resources\Lectures\Tables\LecturesTable;
-use App\Models\Instructor;
 use App\Models\Lecture;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -55,7 +51,8 @@ class LectureResource extends Resource
     {
         return $schema->components([
             DatePicker::make('date')
-                ->required(),
+                ->required()
+                ->live(),
 
             TimePicker::make('start_time')
                 ->seconds(false)

@@ -4,13 +4,7 @@ namespace App\Filament\Resources\Courses\RelationManagers;
 
 use App\Models\Lecture;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -29,9 +23,13 @@ class LecturesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                DatePicker::make('date')->required(),
+                DatePicker::make('date')
+                    ->required()
+                    ->live(),
 
-                TimePicker::make('time')->required(),
+                TimePicker::make('start_time')
+                    ->seconds(false)
+                    ->required(),
 
                  Select::make('instructor_id')
                 ->label('Instructor')

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Instructors\RelationManagers;
 
 use App\Models\Lecture;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -23,9 +23,13 @@ class LecturesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                DatePicker::make('date')->required(),
+                DatePicker::make('date')
+                    ->required()
+                    ->live(),
 
-                TimePicker::make('time')->required(),
+                TimePicker::make('start_time')
+                    ->seconds(false)
+                    ->required(),
 
                  Select::make('instructor_id')
                 ->label('Instructor')
