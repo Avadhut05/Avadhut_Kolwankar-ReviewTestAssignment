@@ -1,60 +1,114 @@
-# Avadhut_Kolwankar-ReviewTestAssignment
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+#  Lecture Scheduling Module (Filament Admin + Instructor Panel)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+##  Overview
 
-## About Laravel
+This project is a **Lecture Scheduling Module** built using **Laravel + Filament**.
+It allows administrators to manage courses, assign lectures (batches), and schedule instructors efficiently while ensuring **no scheduling conflicts occur**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The system enforces strict validation so that:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* An instructor **cannot be assigned multiple lectures on the same date**
+* Lecture schedules **never clash**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+##  Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+###  Admin Panel
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Accessible via `/admin`
 
-## Laravel Sponsors
+* View list of all instructors
+* Add and manage courses
+* Assign lectures (batches) to courses
+* Assign instructors to lectures with dates
+* Inside INstructors and courses we can see all the associated lectures
+* Prevent duplicate instructor scheduling on the same date
+* Upload course images
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+###  Instructor Panel
 
-### Premium Partners
+Accessible via `/instructor`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+* Login as instructor
+* View assigned lectures
+* See course name + lecture date
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+##  Course Structure
 
-## Code of Conduct
+Each **Course** contains:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+* **Name**
+* **Level**
+* **Description**
+* **Image**
+* **Lectures (Batches)**
 
-## Security Vulnerabilities
+Each **Lecture** contains:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* Assigned **Instructor**
+* **Date**
+* (Optional: Time, Duration if implemented)
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+##  Business Rules
+
+*  An instructor **cannot have more than one lecture on the same date**
+*  A lecture date cannot overlap for the same instructor
+*  Multiple lectures allowed for a course (different batches)
+*  Courses can be assigned to different instructors on different dates
+
+---
+
+##  Routes / Links
+
+###  Admin Routes
+
+| Method | Route                        | Description              |
+| ------ | ---------------------------- | ------------------------ |
+| GET    | `/admin/login`               | Admin Login              |
+| POST   | `/admin/logout`              | Admin Logout             |
+| GET    | `/admin/users`               | List Users (Instructors) |
+| GET    | `/admin/users/create`        | Create User              |
+| GET    | `/admin/users/{record}/edit` | Edit User                |
+
+---
+
+###  Instructor Routes
+
+| Method | Route                           | Description            |
+| ------ | ------------------------------- | ---------------------- |
+| GET    | `/instructor/login`             | Instructor Login       |
+| POST   | `/instructor/logout`            | Instructor Logout      |
+| GET    | `/instructor`                   | Instructor Dashboard   |
+| GET    | `/instructor/lectures`          | List Assigned Lectures |
+| GET    | `/instructor/lectures/{record}` | View Lecture Details   |
+
+---
+
+##  Tech Stack
+
+* **Backend:** Laravel
+* **Admin Panel:** Filament
+* **Database:** MySQL
+* **Authentication:** Filament Auth (Multi-panel setup)
+
+---
+
+##  Panels Access
+
+* **Admin Panel:**
+  `http://172.236.179.47/admin/login`
+
+* **Instructor Panel:**
+  `http://172.236.179.47/instructor/login`
+
+```
+
+##  Author
+
+Developed as part of a lecture scheduling system requirement.
+
