@@ -4,12 +4,13 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable,HasRoles;
@@ -49,7 +50,13 @@ class User extends Authenticatable
     }
 
     public function instructor()
-{
-    return $this->hasOne(Instructor::class);
-}
+    {
+        return $this->hasOne(Instructor::class);
+    }
+
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        //Todo : Implement proper access control based on roles/permissions
+        return true;
+    }
 }
