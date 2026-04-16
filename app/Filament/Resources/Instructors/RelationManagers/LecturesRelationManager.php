@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Instructors\RelationManagers;
 
 use App\Models\Lecture;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -23,58 +23,40 @@ class LecturesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                DatePicker::make('date')->required(),
-
-                TimePicker::make('time')->required(),
-
-                 Select::make('instructor_id')
-                ->label('Instructor')
-                ->relationship(
-                    name: 'instructor',
-                    titleAttribute: 'name',
-                    modifyQueryUsing: function ($query, callable $get, $livewire) {
-                        $date = $get('date');
-
-                        $currentInstructorId = $livewire->record?->instructor_id;
-    
-                        if ($date) {
-                            $query->where(function ($q) use ($date, $currentInstructorId, $query) {
-                                $q->whereDoesntHave('lectures', function ($sub) use ($date) {
-                                    $sub->whereDate('date', $date);
-                                });
-
-                                if ($currentInstructorId) {
-                                    $q->orWhere('id', $currentInstructorId);
-                                }
-                            });
+                DatePicker::make('date')
+                    ->required()
+                    ->live()
+                    ->rule(function ($attribute, $value, $fail, $get, $livewire) {
+                        if (! $value) {
+                            return;
                         }
-                    }
-                )
-                ->preload()
-                ->searchable()
-                ->required()
-                ->rule(function ($attribute, $value, $fail, $get, $livewire) {
 
-                    $date = $get('date');
+                        $instructorId = $this->ownerRecord->id;
+                        $lectureId = $livewire->mountedTableActionRecord ?? null;
 
-                    if (! $date || ! $value) {
-                        return;
-                    }
+                        $exists = Lecture::query()
+                            ->where('instructor_id', $instructorId)
+                            ->whereDate('date', $value)
+                            ->when($lectureId, function ($query) use ($lectureId) {
+                                $query->where('id', '!=', $lectureId);
+                            })
+                            ->exists();
 
-                    $lectureId = $livewire->record?->id;
+                        if ($exists) {
+                            $fail('This instructor already has a lecture assigned on the selected date.');
+                        }
+                    }),
 
-                    $exists = Lecture::query()
-                        ->where('instructor_id', $value)
-                        ->whereDate('date', $date)
-                        ->when($lectureId, function ($query) use ($lectureId) {
-                            $query->where('id', '!=', $lectureId);
-                        })
-                        ->exists();
+                TimePicker::make('start_time')
+                    ->seconds(false)
+                    ->required(),
 
-                    if ($exists) {
-                        $fail('This instructor is already assigned for the selected date.');
-                    }
-                }),
+                Select::make('course_id')
+                    ->label('Course')
+                    ->relationship('course', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required(),
 
                 TextInput::make('batch_name'),
             ]);
@@ -97,7 +79,7 @@ class LecturesRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('start_time')
-                    ->time()
+                    ->time('h:i A')
                     ->sortable(),
 
                 TextColumn::make('batch_name'),

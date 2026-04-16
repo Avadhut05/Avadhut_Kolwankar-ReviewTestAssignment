@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Instructor;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -30,22 +29,18 @@ class UserSeeder extends Seeder
 
     $admin->assignRole($adminRole);
 
-    // Create Instructors
-    for ($i = 1; $i <= 5; $i++) {
+    // Create Instructors using factories
+    User::factory()
+        ->count(5)
+        ->create()
+        ->each(function (User $user) use ($instructorRole) {
+            $user->assignRole($instructorRole);
 
-        $user = User::create([
-            'name' => "Instructor $i",
-            'email' => "instructor$i@test.com",
-            'password' => Hash::make('password'),
-        ]);
-
-        $user->assignRole($instructorRole);
-
-        Instructor::create([
-            'name' => $user->name,
-            'email' => $user->email,
-            'user_id' => $user->id,
-        ]);
-    }
+            Instructor::factory()->create([
+                'name' => $user->name,
+                'email' => $user->email,
+                'user_id' => $user->id,
+            ]);
+        });
     }
 }

@@ -4,13 +4,7 @@ namespace App\Filament\Resources\Courses\RelationManagers;
 
 use App\Models\Lecture;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -29,22 +23,25 @@ class LecturesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                DatePicker::make('date')->required(),
+                DatePicker::make('date')
+                    ->required()
+                    ->live(),
 
-                TimePicker::make('time')->required(),
+                TimePicker::make('start_time')
+                    ->seconds(false)
+                    ->required(),
 
                  Select::make('instructor_id')
                 ->label('Instructor')
                 ->relationship(
                     name: 'instructor',
                     titleAttribute: 'name',
-                    modifyQueryUsing: function ($query, callable $get, $livewire) {
+                    modifyQueryUsing: function ($query, callable $get) {
                         $date = $get('date');
+                        $currentInstructorId = $get('instructor_id');
 
-                        $currentInstructorId = $livewire->record?->instructor_id;
-    
                         if ($date) {
-                            $query->where(function ($q) use ($date, $currentInstructorId, $query) {
+                            $query->where(function ($q) use ($date, $currentInstructorId) {
                                 $q->whereDoesntHave('lectures', function ($sub) use ($date) {
                                     $sub->whereDate('date', $date);
                                 });
@@ -67,7 +64,7 @@ class LecturesRelationManager extends RelationManager
                         return;
                     }
 
-                    $lectureId = $livewire->record?->id;
+                    $lectureId = $livewire->mountedTableActionRecord ?? null;
 
                     $exists = Lecture::query()
                         ->where('instructor_id', $value)
@@ -103,7 +100,7 @@ class LecturesRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('start_time')
-                    ->time()
+                    ->time('h:i A')
                     ->sortable(),
 
                 TextColumn::make('batch_name'),
