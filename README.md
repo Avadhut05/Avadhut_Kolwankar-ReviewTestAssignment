@@ -22,7 +22,7 @@ Accessible via `/admin`
 * Add and manage courses
 * Assign lectures (batches) to courses
 * Assign instructors to lectures with dates
-* Inside INstructors and courses we can see all the associated lectures
+* Inside Instructors and courses we can see all the associated lectures 
 * Prevent duplicate instructor scheduling on the same date
 * Upload course images
 
